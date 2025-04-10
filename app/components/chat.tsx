@@ -1462,11 +1462,12 @@ function _Chat() {
         const payload = JSON.parse(text) as {
           key?: string;
           url?: string;
+          model?: string;
         };
 
         console.log("[Command] got settings from url: ", payload);
 
-        if (payload.key || payload.url) {
+        if (payload.key || payload.url || payload.model) {
           showConfirm(
             Locale.URLCommand.Settings +
               `\n${JSON.stringify(payload, null, 4)}`,
@@ -1479,6 +1480,14 @@ function _Chat() {
             }
             if (payload.url) {
               accessStore.update((access) => (access.openaiUrl = payload.url!));
+            }
+            if (payload.model) {
+              // 更新自定义模型
+              const modelConfig = useAppConfig.getState().modelConfig;
+              const appConfig = useAppConfig.getState();
+              appConfig.update((config) => {
+                config.modelConfig.model = payload.model!;
+              });
             }
             accessStore.update((access) => (access.useCustomConfig = true));
           });
